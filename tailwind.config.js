@@ -1,4 +1,5 @@
 const colors = require('tailwindcss/colors');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
     purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
@@ -13,6 +14,7 @@ module.exports = {
             gray: colors.trueGray,
             indigo: colors.indigo,
             red: colors.red,
+            rose: colors.rose,
             yellow: colors.amber,
             blueGray: colors.blueGray,
             lightBlue: colors.lightBlue,
@@ -20,12 +22,17 @@ module.exports = {
             green: colors.green,
             orange: colors.orange,
         },
+        screens: {
+            xsm: '450px',
+            ...defaultTheme.screens,
+        },
         extend: {
             colors: {
                 pokerGreen: '#076324',
             },
-            screens: {
-                'xsm': '450px',
+            width: {
+                350: '350px',
+                450: '450px',
             },
         },
     },
@@ -37,4 +44,7 @@ module.exports = {
             borderRadius: ['first'],
         },
     },
+	plugins: [
+        require('@tailwindcss/forms'),
+    ],
 };

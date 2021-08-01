@@ -2,24 +2,24 @@ import React from 'react';
 
 const sizeTable = { lg: 1, md: 0.75, sm: 0.5 };
 
-type Card = (NumberCard | FaceCard | { back: boolean }) & { size?: 'lg' | 'md' | 'sm' };
+export type CardType = (NumberCard | FaceCard | { back: boolean }) & BaseCard;
 
-export const Card = ({ size, ...props }: Card) => {
+export const Card = ({ size, translateX, translateY, ...props }: CardType) => {
     if ('faceCard' in props)
         return (
-            <BaseCard size={size}>
+            <BaseCard size={size} translateX={translateX} translateY={translateY}>
                 <FaceCard suit={props.suit} faceCard={props.faceCard} />
             </BaseCard>
         );
     if ('number' in props)
         return (
-            <BaseCard size={size}>
+            <BaseCard size={size} translateX={translateX} translateY={translateY}>
                 <NumberCard suit={props.suit} number={props.number} />
             </BaseCard>
         );
     if ('back' in props)
         return (
-            <BaseCard size={size}>
+            <BaseCard size={size} translateX={translateX} translateY={translateY}>
                 <BackCard />
             </BaseCard>
         );
@@ -28,17 +28,23 @@ export const Card = ({ size, ...props }: Card) => {
 
 interface BaseCard {
     size?: 'lg' | 'md' | 'sm';
-    children: React.ReactNode;
+    translateX?: number;
+    translateY?: number;
 }
 
-const BaseCard = ({ size = 'lg', children }: BaseCard) => {
+const BaseCard = ({
+    size = 'lg',
+    children,
+    translateX: X = 0,
+    translateY: Y = 0,
+}: BaseCard & { children: React.ReactNode }) => {
     const width = `${sizeTable[size] * 200}px`;
     const height = `${sizeTable[size] * 280}px`;
     const scale = `scale(${sizeTable[size] * 1})`;
     const t = size === 'md' ? -16 : (1 - sizeTable[size]) * -100;
     const translate = `translate(${t}%, ${t}%)`;
     return (
-        <div className="m-3" style={{ width, height }}>
+        <div className="m-3 absolute" style={{ width, height, transform: `translate(${X}%,${Y}%)` }}>
             <div style={{ transform: `${scale} ${translate}` }}>{children}</div>
         </div>
     );

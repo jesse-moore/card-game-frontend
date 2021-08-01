@@ -104,7 +104,7 @@ dist
 .tern-port
 
 # local env files
-.env.dev
+.env.development
 .env.production
 
 # graphql-let
