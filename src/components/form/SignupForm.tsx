@@ -3,10 +3,12 @@ import { useRouter } from 'next/router';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import { useAuth } from '../../lib/useAuth';
+import { useCreateUserMutation } from '../../graphql/queries';
 import { CloseButton } from './CloseButton';
-import { useAuth } from '../../lib/context/useAuth';
 
 export const SignupForm = ({ handleClose }: { handleClose: () => void }) => {
+    const [createUser] = useCreateUserMutation();
     const router = useRouter();
     const auth = useAuth();
     const validationSchema = Yup.object().shape({
@@ -37,7 +39,9 @@ export const SignupForm = ({ handleClose }: { handleClose: () => void }) => {
     };
 
     const onSubmit: SubmitHandler<FormValues> = async ({ email, password, username }) => {
-        const user = await auth.signup(email, password, username);
+        await auth.signup(email, password, username);
+        const user = await auth.signin(username, password);
+        await createUser();
         if (user !== null) {
             handleClose();
         }

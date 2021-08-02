@@ -1,67 +1,69 @@
-// import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 import Router from 'next/router';
-// import { toggleSignupForm, toggleLoginForm } from '../../lib/redux/reducers/ui';
-// import { signout } from '../../lib/redux/reducers/user';
-// import { logout } from '../../lib/cognito';
-// import { apolloClient } from '../../lib/graphql/apollo';
-// import { Button } from './Button';
-import { Dispatch } from 'react';
+import { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState } from 'react';
+import { useComponentFocused } from '../../lib/useComponentFocused';
 import { HomeIcon } from './HomeIcon';
 import { SettingsIcon } from './SettingsIcon';
-// import { ButtonLink } from './ButtonLink';
-// import { RootState } from '../../lib/redux/reducers';
+import { useAuth } from '../../lib/useAuth';
 
 export const NarBar = () => {
-    // const dispatch = useDispatch();
-    // const { user } = useSelector((state: RootState) => state.user);
-    const user = {};
+    const auth = useAuth();
+    const [settingsMenu, setSettingsMenu] = useState<boolean>(false);
+
     const handleLogout = () => {
-        // logout();
-        // dispatch(signout());
-        // apolloClient?.clearStore();
-        // Router.push('/');
+        auth.signout();
+        setSettingsMenu(false);
     };
 
     return (
-        <div className="w-full py-1 px-4 flex flex-row items-center bg-white sticky top-0 z-20">
+        <div className="w-full py-1 px-4 flex flex-row items-center bg-white fixed top-0 z-20">
             <div className="container mx-auto flex flex-row relative">
                 <Link href="/">
-                    <button className="mr-auto text-xl cursor-pointer px-4 py-2 hover:shadow-md border-2 border-white hover:border-lightBlue-700 focus:outline-none active:shadow-inner rounded">
+                    <button className="mr-auto text-xl px-4 py-2 hover:shadow-md border-2 border-white hover:border-lightBlue-700 focus:outline-none active:shadow-inner rounded">
                         <HomeIcon />
                     </button>
                 </Link>
-
-                {/* {user ? (
-				<AuthenticatedUserNavLinks handleLogout={handleLogout} />
-				) : (
-					<UnauthenticatedUserNavLinks dispatch={dispatch} />
-				)} */}
-                <button className="text-xl cursor-pointer px-4 py-2 hover:shadow-md border-2 border-white hover:border-lightBlue-700 focus:outline-none active:shadow-inner rounded">
+                <button
+                    className="text-xl px-4 py-2 hover:shadow-md border-2 border-white hover:border-lightBlue-700 focus:outline-none active:shadow-inner rounded"
+                    onClick={() => setSettingsMenu(true)}
+                >
                     <SettingsIcon />
                 </button>
-                <div className="absolute bg-white h-36 w-48 right-0 top-12"></div>
+                {settingsMenu && (
+                    <SettingsMenu handleClose={setSettingsMenu} handleLogout={handleLogout} />
+                )}
             </div>
         </div>
     );
 };
 
-const AuthenticatedUserNavLinks = ({ handleLogout }: { handleLogout: any }) => {
-    return (
-        <>
-            {/* <Button name="Logout" onClick={() => handleLogout()} />
-            <Link href="/app" passHref>
-                <ButtonLink name="Go to console" color="blue" />
-            </Link> */}
-        </>
-    );
-};
+interface SettingsMenu {
+    handleClose: Dispatch<SetStateAction<boolean>>;
+    handleLogout: MouseEventHandler;
+}
 
-const UnauthenticatedUserNavLinks = ({ dispatch }: { dispatch: Dispatch<any> }) => {
+const SettingsMenu = ({ handleClose, handleLogout }: SettingsMenu) => {
+    const auth = useAuth();
+    const { ref, isComponentFocused } = useComponentFocused(true);
+    useEffect(() => {
+        if (!isComponentFocused) handleClose(false);
+    }, [isComponentFocused]);
     return (
-        <>
-            {/* <Button name="Login" onClick={() => dispatch(toggleLoginForm())} /> */}
-            {/* <Button name="Signup" color="blue" onClick={() => dispatch(toggleSignupForm())} /> */}
-        </>
+        <div
+            className="absolute bg-white w-48 right-0 top-12 flex flex-col place-items-center"
+            ref={ref}
+        >
+            <button className="w-full py-2 border-2 border-white hover:border-lightBlue-700 focus:outline-none">
+                Game Settings
+            </button>
+            {auth.user && (
+                <button
+                    className="w-full py-2 border-2 border-white hover:border-lightBlue-700 focus:outline-none"
+                    onClick={handleLogout}
+                >
+                    Logout
+                </button>
+            )}
+        </div>
     );
 };

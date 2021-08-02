@@ -2,27 +2,41 @@ import React from 'react';
 
 const sizeTable = { lg: 1, md: 0.75, sm: 0.5 };
 
-export type CardType = (NumberCard | FaceCard | { back: boolean }) & BaseCard;
+export type CardType = (Card | { back: boolean }) & BaseCard;
+
+// type Card = {
+//     suit: 'club' | 'diamond' | 'spade' | 'heart';
+//     number: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+//     faceCard?: 'king' | 'queen' | 'jack' | 'ace';
+// };
+type Card = {
+    suit: string;
+    number: number;
+    faceCard?: string;
+};
 
 export const Card = ({ size, translateX, translateY, ...props }: CardType) => {
-    if ('faceCard' in props)
-        return (
-            <BaseCard size={size} translateX={translateX} translateY={translateY}>
-                <FaceCard suit={props.suit} faceCard={props.faceCard} />
-            </BaseCard>
-        );
-    if ('number' in props)
-        return (
-            <BaseCard size={size} translateX={translateX} translateY={translateY}>
-                <NumberCard suit={props.suit} number={props.number} />
-            </BaseCard>
-        );
-    if ('back' in props)
+    if ('back' in props) {
         return (
             <BaseCard size={size} translateX={translateX} translateY={translateY}>
                 <BackCard />
             </BaseCard>
         );
+    }
+    if (props.faceCard) {
+        return (
+            <BaseCard size={size} translateX={translateX} translateY={translateY}>
+                <FaceCard suit={props.suit} faceCard={props.faceCard} number={props.number} />
+            </BaseCard>
+        );
+    }
+    if (props.number) {
+        return (
+            <BaseCard size={size} translateX={translateX} translateY={translateY}>
+                <NumberCard suit={props.suit} number={props.number} />
+            </BaseCard>
+        );
+    }
     return <div className="card text-center pt-28 font-semibold">Invalid Card Type</div>;
 };
 
@@ -44,7 +58,10 @@ const BaseCard = ({
     const t = size === 'md' ? -16 : (1 - sizeTable[size]) * -100;
     const translate = `translate(${t}%, ${t}%)`;
     return (
-        <div className="m-3 absolute" style={{ width, height, transform: `translate(${X}%,${Y}%)` }}>
+        <div
+            className="m-3 absolute"
+            style={{ width, height, transform: `translate(${X}%,${Y}%)` }}
+        >
             <div style={{ transform: `${scale} ${translate}` }}>{children}</div>
         </div>
     );
@@ -54,12 +71,7 @@ const BackCard = () => {
     return <div className="card back" />;
 };
 
-type NumberCard = {
-    suit: 'club' | 'diamond' | 'spade' | 'heart';
-    number: 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-};
-
-const NumberCard = ({ number: n, suit }) => {
+const NumberCard = ({ number: n, suit }: Card) => {
     return (
         <div className={`card ${suit}${n === 10 ? ' ten' : ''}`}>
             <div className="corner top">
@@ -90,12 +102,7 @@ const NumberCard = ({ number: n, suit }) => {
     );
 };
 
-type FaceCard = {
-    suit: 'club' | 'diamond' | 'spade' | 'heart';
-    faceCard: 'king' | 'queen' | 'jack' | 'ace';
-};
-
-const FaceCard = ({ suit, faceCard }: FaceCard) => {
+const FaceCard = ({ suit, faceCard }: Card) => {
     const face = faceCard.charAt(0).toUpperCase();
     return (
         <div className={`card ${suit} ${faceCard}`}>
@@ -114,7 +121,7 @@ const FaceCard = ({ suit, faceCard }: FaceCard) => {
 };
 
 interface Suit {
-    suit: 'club' | 'diamond' | 'spade' | 'heart';
+    suit: string;
     className?: string;
 }
 

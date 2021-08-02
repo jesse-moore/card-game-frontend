@@ -1,0 +1,56 @@
+fragment status on GameStatus {
+    id
+    dealer {
+        ...player
+    }
+    player {
+        ...player
+    }
+    isStarted
+    isWaiting
+    isFinished
+    reshuffled
+}
+
+fragment player on Player {
+    id
+    cards {
+        ...card
+    }
+    count
+    status
+    cash
+    winLose
+}
+
+fragment card on Card {
+    suit
+    number
+    faceCard
+}
+
+mutation StartGame($playerId: String!, $bet: Int!) {
+    newGame(playerId: $playerId, bet: $bet) {
+        ...status
+    }
+}
+
+mutation StartRound($id: String!, $bet: Int!, $playerId: String) {
+    startNewRound(id: $id, bet: $bet, playerId: $playerId) {
+        ...status
+    }
+}
+
+mutation GameAction($id: String!, $action: String!, $playerId: String) {
+    gameAction(id: $id, action: $action, playerId: $playerId) {
+        ...status
+    }
+}
+
+mutation RestoreBalance($id: String!, $playerId: String) {
+    restoreBalance(id: $id, playerId: $playerId)
+}
+
+mutation RemoveGame($id: String!) {
+    removeGame(id: $id)
+}

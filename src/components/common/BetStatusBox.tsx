@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { MouseEventHandler } from 'react';
 import { ChangeBetButton } from './ChangeBetButton';
 export interface BetStatusBox {
+    disablePlaceBet?: boolean;
     bet: string;
     total: string;
     onClick: MouseEventHandler;
 }
-export const BetStatusBox = ({ bet, total, onClick }: BetStatusBox) => {
+export const BetStatusBox = ({ bet, disablePlaceBet, total, onClick }: BetStatusBox) => {
     const [hover, setHover] = useState(false);
 
     return (
@@ -26,7 +27,7 @@ export const BetStatusBox = ({ bet, total, onClick }: BetStatusBox) => {
                 </div>
                 <div>{`$${total}.00`}</div>
             </div>
-            {hover && <ChangeBetButton onClick={onClick} />}
+            {hover && !disablePlaceBet && <ChangeBetButton onClick={onClick} />}
         </div>
     );
 };

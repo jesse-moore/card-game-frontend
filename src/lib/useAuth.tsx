@@ -1,7 +1,7 @@
 import React, { useState, useContext, createContext, ReactNode, useEffect } from 'react';
 import jwt_decode from 'jwt-decode';
-import * as cognito from '../cognito/index';
-import { UserDataInterface } from '../../types';
+import * as cognito from './cognito/index';
+import { UserDataInterface } from '../types';
 
 interface AuthContext {
     user: UserDataInterface | null;
@@ -61,14 +61,15 @@ function useProvideAuth(children: React.ReactNode) {
     };
     const signup = async (email: string, password: string, username: string) => {
         try {
-            // setUser(user);
-            const user = await cognito.signup({ email, password, username });
-            console.log(user);
+            await cognito.signup({ email, password, username });
+            const user = await cognito.getUser();
+            setUser(user);
         } catch (error) {
             return { error: 'Error signing up, try again later' };
         }
     };
     const signout = () => {
+        cognito.logout();
         setUser(null);
     };
 

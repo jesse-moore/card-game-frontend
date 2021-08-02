@@ -1,0 +1,14 @@
+query test {
+    test
+}
+
+query getUser {
+    getUser {
+        id
+        cash
+    }
+}
+
+mutation CreateUser {
+    createUser
+}

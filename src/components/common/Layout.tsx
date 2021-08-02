@@ -3,9 +3,9 @@ import { NarBar } from './NarBar';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className="relative flex flex-col min-h-screen bg-blueGray-300">
+        <div className="relative flex flex-col bg-blueGray-300 min-h-screen">
             <NarBar />
-            <div className="flex-grow">{children}</div>
+            {children}
         </div>
     );
 };

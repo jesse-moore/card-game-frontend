@@ -9,7 +9,7 @@ interface PlaceBetModal {
 }
 
 export const PlaceBetModal = ({
-    maxBet = 100,
+    maxBet = 1000,
     minBet = 25,
     bet: currentBet,
     onSubmit,
