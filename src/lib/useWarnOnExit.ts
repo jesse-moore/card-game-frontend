@@ -5,7 +5,7 @@ export const useWarningOnExit = (
     shouldWarn: boolean,
     message: string,
     id: string,
-    onUnload?: (id: string) => void
+    onUnload: (id: string) => void
 ) => {
     const Router = useRouter();
     const [isChangeRoute, setIsChangeRoute] = useState<boolean>(false);
