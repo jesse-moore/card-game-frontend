@@ -12,7 +12,7 @@ export type CardType = (Card | { back: boolean }) & BaseCard;
 type Card = {
     suit: string;
     number: number;
-    faceCard?: string;
+    faceCard?: string | null;
 };
 
 export const Card = ({ size, translateX, translateY, ...props }: CardType) => {
@@ -102,7 +102,13 @@ const NumberCard = ({ number: n, suit }: Card) => {
     );
 };
 
-const FaceCard = ({ suit, faceCard }: Card) => {
+interface FaceCard {
+    suit: string;
+    number: number;
+    faceCard: string;
+}
+
+const FaceCard = ({ suit, faceCard }: FaceCard) => {
     const face = faceCard.charAt(0).toUpperCase();
     return (
         <div className={`card ${suit} ${faceCard}`}>

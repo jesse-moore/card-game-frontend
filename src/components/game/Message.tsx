@@ -7,7 +7,12 @@ interface Message {
 
 export const Message = ({ status, amount }: Message) => {
     const message = status === 1 ? 'You Lose' : status === 2 ? 'You Win' : 'Tie';
-    const color = status === 1 ? 'red' : status === 2 ? 'green' : 'blue';
+    const color =
+        status === 1
+            ? 'text-red-400 ml-2'
+            : status === 2
+            ? 'text-green-400 ml-2'
+            : 'text-blue-400 ml-2';
     const sign = status === 1 ? '-' : '+';
     return (
         <div
@@ -17,9 +22,7 @@ export const Message = ({ status, amount }: Message) => {
             <div className="xsm:text-3xl text-lg">
                 <div className="flex flex-row flex-nowrap whitespace-nowrap justify-center">
                     <div>{message}</div>
-                    <div className={`text-${color}-400 ml-2`}>
-                        {status !== 3 && `${sign}$${amount}`}
-                    </div>
+                    <div className={color}>{status !== 3 && `${sign}$${amount}`}</div>
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { FormEventHandler, useState } from 'react';
-import { Modal } from './modal';
+import { Modal } from '../common/modal';
 
 interface PlaceBetModal {
     maxBet?: number;

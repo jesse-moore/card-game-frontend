@@ -1,12 +1,15 @@
 import Link from 'next/link';
-import Router from 'next/router';
 import { Dispatch, MouseEventHandler, SetStateAction, useEffect, useState } from 'react';
 import { useComponentFocused } from '../../lib/useComponentFocused';
 import { HomeIcon } from './HomeIcon';
 import { SettingsIcon } from './SettingsIcon';
 import { useAuth } from '../../lib/useAuth';
 
-export const NarBar = () => {
+interface NavBar {
+    handleGameSettings: MouseEventHandler;
+}
+
+export const NavBar = ({ handleGameSettings }: NavBar) => {
     const auth = useAuth();
     const [settingsMenu, setSettingsMenu] = useState<boolean>(false);
 
@@ -30,7 +33,11 @@ export const NarBar = () => {
                     <SettingsIcon />
                 </button>
                 {settingsMenu && (
-                    <SettingsMenu handleClose={setSettingsMenu} handleLogout={handleLogout} />
+                    <SettingsMenu
+                        handleClose={setSettingsMenu}
+                        handleLogout={handleLogout}
+                        handleGameSettings={handleGameSettings}
+                    />
                 )}
             </div>
         </div>
@@ -40,9 +47,10 @@ export const NarBar = () => {
 interface SettingsMenu {
     handleClose: Dispatch<SetStateAction<boolean>>;
     handleLogout: MouseEventHandler;
+    handleGameSettings: MouseEventHandler;
 }
 
-const SettingsMenu = ({ handleClose, handleLogout }: SettingsMenu) => {
+const SettingsMenu = ({ handleClose, handleLogout, handleGameSettings }: SettingsMenu) => {
     const auth = useAuth();
     const { ref, isComponentFocused } = useComponentFocused(true);
     useEffect(() => {
@@ -53,7 +61,10 @@ const SettingsMenu = ({ handleClose, handleLogout }: SettingsMenu) => {
             className="absolute bg-white w-48 right-0 top-12 flex flex-col place-items-center"
             ref={ref}
         >
-            <button className="w-full py-2 border-2 border-white hover:border-lightBlue-700 focus:outline-none">
+            <button
+                className="w-full py-2 border-2 border-white hover:border-lightBlue-700 focus:outline-none"
+                onClick={handleGameSettings}
+            >
                 Game Settings
             </button>
             {auth.user && (

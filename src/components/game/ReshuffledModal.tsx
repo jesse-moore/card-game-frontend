@@ -1,7 +1,7 @@
 import React, { FormEventHandler, useState } from 'react';
 import { MouseEventHandler } from 'react';
-import { Button } from './Button';
-import { Modal } from './modal';
+import { Button } from '../common/Button';
+import { Modal } from '../common/modal';
 
 interface ReshuffledModal {
     handleClose: MouseEventHandler;

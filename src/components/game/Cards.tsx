@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardType } from '../game/Card';
+import { Card, CardType } from './Card';
 
 const sizeTable = { lg: 1, md: 0.75, sm: 0.5 };
 export interface Cards {

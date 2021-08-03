@@ -1,12 +1,9 @@
 import React, { FormEvent, useState } from 'react';
 import { useRouter } from 'next/router';
-import { CloseIcon } from './CloseIcon';
-import { Button } from '../common/Button';
 import { CloseButton } from './CloseButton';
 import { useAuth } from '../../lib/useAuth';
 
 export const LoginForm = ({ handleClose }: { handleClose: () => void }) => {
-    const router = useRouter();
     const auth = useAuth();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,15 +11,16 @@ export const LoginForm = ({ handleClose }: { handleClose: () => void }) => {
 
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const user = await auth.signin(username, password);
+        const error = await auth.signin(username, password);
+        if (error) setError(error.error);
     };
 
     return (
-        <div className="bg-blueGray-400 shadow-md px-6 pt-8 relative">
+        <div className="bg-blueGray-400 shadow-md px-6 pt-8 relative w-72">
             <div className="absolute right-0 top-0">
                 <CloseButton onClick={handleClose} />
             </div>
-            <span className="text-red-600 font-semibold">{error}</span>
+            <span className="text-red-800 font-semibold">{error}</span>
             <form className="grid grid-cols-1 gap-6" onSubmit={handleLogin}>
                 <label className="block">
                     <span className="text-lg font-semibold">Username</span>
