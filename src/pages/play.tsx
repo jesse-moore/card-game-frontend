@@ -1,12 +1,17 @@
 import React, { useEffect, useState, MouseEventHandler } from 'react';
+import { useRouter } from 'next/router';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { useAuth } from '../lib/useAuth';
 import { useWarningOnExit } from '../lib/useWarnOnExit';
-import { PlayActions } from '../components/common/PlayActions';
-import { PlaceBetModal } from '../components/common/PlaceBetModal';
-import { Cards } from '../components/common/Cards';
-import { BetStatusBox } from '../components/common/BetStatusBox';
+import { PlayActions } from '../components/game/PlayActions';
+import { PlaceBetModal } from '../components/game/PlaceBetModal';
+import { Cards } from '../components/game/Cards';
+import { BetStatusBox } from '../components/game/BetStatusBox';
 import { Layout } from '../components/common/Layout';
+import { HandMessage } from '../components/game/HandMessage';
+import { Message } from '../components/game/Message';
+import { RestoreBalanceModal } from '../components/game/RestoreBalanceModal';
+import { ReshuffledModal } from '../components/game/ReshuffledModal';
 import {
     useGetUserQuery,
     useStartGameMutation,
@@ -17,10 +22,6 @@ import {
     useRestoreBalanceMutation,
     useRemoveGameMutation,
 } from '../graphql/queries';
-import { HandMessage } from '../components/common/HandMessage';
-import { Message } from '../components/common/Message';
-import { RestoreBalanceModal } from '../components/common/RestoreBalanceModal';
-import { ReshuffledModal } from '../components/common/ReshuffledModal';
 
 const initialState = {
     id: '',
@@ -30,10 +31,12 @@ const initialState = {
     isWaiting: false,
     isFinished: true,
     reshuffled: false,
+    bet: 0,
 };
 
 const Play = () => {
     const auth = useAuth();
+    const router = useRouter();
     const { data: userData, error: userError, loading } = useGetUserQuery();
     const [startGame] = useStartGameMutation();
     const [gameAction] = useGameActionMutation();
@@ -41,7 +44,7 @@ const Play = () => {
     const [restoreBalanceMutation] = useRestoreBalanceMutation();
     const [removeGame] = useRemoveGameMutation();
     const [userState, setUserState] = useState<User>({ id: '', cash: 0 });
-    const [gameState, setgameState] = useState<GameStatus | null>(initialState);
+    const [gameState, setgameState] = useState<GameStatus>(initialState);
     const [bet, setBet] = useState<string>('25');
     const [placeBet, setPlaceBet] = useState<boolean>(false);
     const [restoreBalance, setRestoreBalance] = useState(false);
@@ -65,6 +68,7 @@ const Play = () => {
 
     const handleRemoveGame = async (id: string) => {
         if (!id) return;
+        console.log('REMOVE GAME');
         // await removeGame({ variables: { id } });
     };
 
@@ -76,19 +80,29 @@ const Play = () => {
     }, [gameState.id]);
 
     useEffect(() => {
-        if (userError || !userData) return;
-        const { getUser } = userData;
-        if (getUser) {
-            setUserState(getUser);
+        try {
+            if (userError) throw new Error();
+            if (!userData) return;
+            const { getUser } = userData;
+            if (getUser) {
+                setUserState(getUser);
+            }
+        } catch (error) {
+            auth.signout();
+            router.push('/');
         }
     }, [userData]);
 
     useEffect(() => {
         const rb = async () => {
-            const { data } = await restoreBalanceMutation({
-                variables: { id: gameState.id, playerId: isGuest ? userState.id : undefined },
-            });
-            if (data) setUserState({ ...userState, cash: data.restoreBalance });
+            try {
+                const { data, errors } = await restoreBalanceMutation({
+                    variables: { id: gameState.id, playerId: isGuest ? userState.id : undefined },
+                });
+                if (data) setUserState({ ...userState, cash: data.restoreBalance });
+            } catch (error) {
+                router.reload();
+            }
         };
         if (!loading && userState.cash <= 0) {
             setRestoreBalance(true);
@@ -103,34 +117,46 @@ const Play = () => {
     }, [reshuffled]);
 
     const handleStartGame = async () => {
-        const { data, errors } = await startGame({
-            variables: { playerId: userState.id, bet: Number(bet) },
-        });
-        if (!errors && data) {
-            setgameState(data.newGame);
-            setUserState({ ...userState, cash: data.newGame.player.cash });
+        try {
+            const { data, errors } = await startGame({
+                variables: { playerId: userState.id, bet: Number(bet) },
+            });
+            if (!errors && data) {
+                setgameState(data.newGame);
+                setUserState({ ...userState, cash: data.newGame.player.cash });
+            }
+        } catch (error) {
+            router.push('/');
         }
     };
 
     const handleStartRound = async () => {
-        const { data, errors } = await startRound({
-            variables: { id, bet: Number(bet), playerId: isGuest ? userState.id : undefined },
-        });
-        if (!errors && data) {
-            setgameState(data.startNewRound);
-            setUserState({ ...userState, cash: data.startNewRound.player.cash });
+        try {
+            const { data, errors } = await startRound({
+                variables: { id, bet: Number(bet), playerId: isGuest ? userState.id : undefined },
+            });
+            if (!errors && data) {
+                setgameState(data.startNewRound);
+                setUserState({ ...userState, cash: data.startNewRound.player.cash });
+            }
+        } catch (error) {
+            handleStartGame();
         }
     };
 
     const handleGameAction: MouseEventHandler<HTMLButtonElement> = ({ currentTarget }) => {
         const { name } = currentTarget;
         const sendAction = async () => {
-            const { data, errors } = await gameAction({
-                variables: { id, action: name, playerId: isGuest ? userState.id : undefined },
-            });
-            if (!errors && data) {
-                setgameState(data.gameAction);
-                setUserState({ ...userState, cash: data.gameAction.player.cash });
+            try {
+                const { data, errors } = await gameAction({
+                    variables: { id, action: name, playerId: isGuest ? userState.id : undefined },
+                });
+                if (!errors && data) {
+                    setgameState(data.gameAction);
+                    setUserState({ ...userState, cash: data.gameAction.player.cash });
+                }
+            } catch (error) {
+                handleStartGame();
             }
         };
         sendAction();
@@ -156,7 +182,9 @@ const Play = () => {
                     </div>
                     <div className="relative">
                         {isFinished && player.winLose > 0 && (
-                            <Message {...{ status: player.winLose, amount: Number(bet) }} />
+                            <Message
+                                {...{ status: player.winLose, amount: Number(gameState.bet) }}
+                            />
                         )}
                         <h2 className="font-semibold text-white opacity-20 text-center mt-2 lg:mt-1 mb-2 xsm:py-6 md:py-6 text-3xl xsm:text-5xl lg:text-7xl tracking-widest font-serif">
                             Black Jack
