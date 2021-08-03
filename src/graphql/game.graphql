@@ -10,6 +10,7 @@ fragment status on GameStatus {
     isWaiting
     isFinished
     reshuffled
+	bet
 }
 
 fragment player on Player {

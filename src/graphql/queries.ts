@@ -37,6 +37,7 @@ export type GameStatus = {
   isWaiting: Scalars['Boolean'];
   isFinished: Scalars['Boolean'];
   reshuffled: Scalars['Boolean'];
+  bet: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -46,7 +47,6 @@ export type Mutation = {
   startNewRound: GameStatus;
   removeGame?: Maybe<Scalars['String']>;
   gameAction: GameStatus;
-  test?: Maybe<Scalars['String']>;
   restoreBalance: Scalars['Int'];
 };
 
@@ -85,7 +85,7 @@ export type MutationRestoreBalanceArgs = {
 export type Player = {
   __typename?: 'Player';
   id: Scalars['String'];
-  cards: Array<Maybe<Card>>;
+  cards: Array<Card>;
   count: Scalars['Int'];
   status: Scalars['Int'];
   winLose: Scalars['Int'];
@@ -94,14 +94,13 @@ export type Player = {
 
 export type Query = {
   __typename?: 'Query';
-  test?: Maybe<Scalars['String']>;
-  status?: Maybe<Scalars['String']>;
+  status: Status;
   getUser: User;
 };
 
-
-export type QueryStatusArgs = {
-  id?: Maybe<Scalars['String']>;
+export type Status = {
+  __typename?: 'Status';
+  games: Array<Maybe<Scalars['String']>>;
 };
 
 
@@ -113,7 +112,7 @@ export type User = {
 
 export type StatusFragment = (
   { __typename?: 'GameStatus' }
-  & Pick<GameStatus, 'id' | 'isStarted' | 'isWaiting' | 'isFinished' | 'reshuffled'>
+  & Pick<GameStatus, 'id' | 'isStarted' | 'isWaiting' | 'isFinished' | 'reshuffled' | 'bet'>
   & { dealer: (
     { __typename?: 'Player' }
     & PlayerFragment
@@ -126,10 +125,10 @@ export type StatusFragment = (
 export type PlayerFragment = (
   { __typename?: 'Player' }
   & Pick<Player, 'id' | 'count' | 'status' | 'cash' | 'winLose'>
-  & { cards: Array<Maybe<(
+  & { cards: Array<(
     { __typename?: 'Card' }
     & CardFragment
-  )>> }
+  )> }
 );
 
 export type CardFragment = (
@@ -202,14 +201,6 @@ export type RemoveGameMutation = (
   & Pick<Mutation, 'removeGame'>
 );
 
-export type TestQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type TestQuery = (
-  { __typename?: 'Query' }
-  & Pick<Query, 'test'>
-);
-
 export type GetUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -261,6 +252,7 @@ export const StatusFragmentDoc = gql`
   isWaiting
   isFinished
   reshuffled
+  bet
 }
     ${PlayerFragmentDoc}`;
 export const StartGameDocument = gql`
@@ -430,38 +422,6 @@ export function useRemoveGameMutation(baseOptions?: Apollo.MutationHookOptions<R
 export type RemoveGameMutationHookResult = ReturnType<typeof useRemoveGameMutation>;
 export type RemoveGameMutationResult = Apollo.MutationResult<RemoveGameMutation>;
 export type RemoveGameMutationOptions = Apollo.BaseMutationOptions<RemoveGameMutation, RemoveGameMutationVariables>;
-export const TestDocument = gql`
-    query test {
-  test
-}
-    `;
-
-/**
- * __useTestQuery__
- *
- * To run a query within a React component, call `useTestQuery` and pass it any options that fit your needs.
- * When your component renders, `useTestQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useTestQuery({
- *   variables: {
- *   },
- * });
- */
-export function useTestQuery(baseOptions?: Apollo.QueryHookOptions<TestQuery, TestQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<TestQuery, TestQueryVariables>(TestDocument, options);
-      }
-export function useTestLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TestQuery, TestQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<TestQuery, TestQueryVariables>(TestDocument, options);
-        }
-export type TestQueryHookResult = ReturnType<typeof useTestQuery>;
-export type TestLazyQueryHookResult = ReturnType<typeof useTestLazyQuery>;
-export type TestQueryResult = Apollo.QueryResult<TestQuery, TestQueryVariables>;
 export const GetUserDocument = gql`
     query getUser {
   getUser {
