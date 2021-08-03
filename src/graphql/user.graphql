@@ -1,7 +1,3 @@
-query test {
-    test
-}
-
 query getUser {
     getUser {
         id
