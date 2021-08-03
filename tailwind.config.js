@@ -3,6 +3,7 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
     purge: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
+    options: { safelist: ['text-red-400', 'text-blue-400', 'text-green-400'] },
     darkMode: false, // or 'media' or 'class'
     theme: {
         colors: {
@@ -29,6 +30,9 @@ module.exports = {
         extend: {
             colors: {
                 pokerGreen: '#076324',
+                linkedIn: '#0A66C2',
+                github: '#181717',
+                gmail: '#EA4335',
             },
             width: {
                 350: '350px',
@@ -38,13 +42,8 @@ module.exports = {
     },
     variants: {
         extend: {
-            backgroundColor: ['active'],
-            boxShadow: ['active'],
-            borderRadius: ['last'],
-            borderRadius: ['first'],
+            fill: ['hover'],
         },
     },
-	plugins: [
-        require('@tailwindcss/forms'),
-    ],
+    plugins: [require('@tailwindcss/forms')],
 };
