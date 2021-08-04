@@ -61,9 +61,19 @@
     -moz-transform: rotate(180deg);
     -webkit-transform: rotate(180deg);
 }
+@media only screen and (max-device-width: 600px) {
+    .suit {
+        font-size: 2em;
+    }
+}
+
+@media only screen and (min-device-width: 601px) {
+    .suit {
+        font-size: 4em;
+    }
+}
 
 .card .suit {
-    font-size: 64px;
     font-weight: bold;
     height: 60px;
     line-height: 60px;
